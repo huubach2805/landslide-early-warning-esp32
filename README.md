@@ -22,6 +22,8 @@ Final project for a Microcontroller course (team project).
 | Rain sensor (AO) | Analog | GPIO5 (ADC1) |
 | Passive buzzer | Digital (tone) | GPIO6 |
 
+![Block diagram](docs/block-diagram.png)
+
 ![Breadboard wiring diagram](docs/wiring-diagram.png)
 
 All modules are powered from 3.3 V. Analog inputs use ADC1 pins because ADC2 cannot be used while Wi-Fi is active.
@@ -36,7 +38,11 @@ An alert is triggered only when all three conditions are true:
 | Soil moisture | ≥ 60 % |
 | Rain intensity | ≥ 50 % |
 
-Thresholds were chosen by the team and should be calibrated experimentally. The raw-to-percent mapping (`map(raw, 4095, 1200, 0, 100)`) must also be calibrated for the actual sensors.
+Thresholds were chosen by the team and should be calibrated experimentally. Each analog sensor has its own dry/wet calibration constants (`DAT_KHO`, `DAT_UOT`, `MUA_KHO`, `MUA_UOT`, default 4095 and 1200); replace them with raw values measured on the real sensors.
+
+An alert notification is sent once when the state changes from safe to danger, then not again for 10 minutes:
+
+![Alert notification logic](docs/alert-logic.png)
 
 ## Blynk setup
 
@@ -50,6 +56,10 @@ Datastreams (Virtual Pins):
 | V3 | Alert | Integer | 0–1 |
 
 Event code: `canh_bao_sat_lo` (push notification enabled).
+
+## Code structure
+
+The firmware is written in C style (plain functions, pointers, global variables) on the Arduino framework. `loop()` calls `docCamBien()`, `dieuKhienCoi()`, `hienThiOLED()`, `guiBlynk()` and `guiCanhBao()` in turn.
 
 ## Build and run
 
